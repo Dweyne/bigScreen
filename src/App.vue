@@ -1,0 +1,398 @@
+<script setup>
+import { onMounted, ref } from 'vue';
+
+const showTime = ref('')
+
+onMounted(() => {
+  setInterval(() => {
+    const time = getTime()
+    showTime.value = time.date + ' ' + time.time + ' ' + time.week
+  }, 1000)
+})
+// 格式化
+const _formatNum = (num) => {
+  return num < 10 ? '0' + num : num
+}
+
+// 大屏计时器
+const getTime = () => {
+  const nowDate = new Date()
+  const date = nowDate.getFullYear() + '-' + _formatNum(nowDate.getMonth() + 1) + '-' + _formatNum(nowDate.getDate())
+  const time = _formatNum(nowDate.getHours()) + ':' + _formatNum(nowDate.getMinutes()) + ':' + _formatNum(nowDate.getSeconds())
+  let week = ''
+  switch (nowDate.getDay()) {
+    case 0:
+      week = '星期天'
+      break
+    case 1:
+      week = '星期一'
+      break
+    case 2:
+      week = '星期二'
+      break
+    case 3:
+      week = '星期三'
+      break
+    case 4:
+      week = '星期四'
+      break
+    case 5:
+      week = '星期五'
+      break
+    case 6:
+      week = '星期六'
+      break
+    default:
+      break
+  }
+  return {
+    date,
+    time,
+    week
+  }
+}
+
+</script>
+
+<template>
+  <div class="page-body">
+      <header id="header">
+        <h3 class="header-title">实战演练 - 指挥调度</h3>
+        <div class="showTime">{{ showTime }}</div>
+      </header>
+    
+      <div id="container">
+        <div id="flexCon">
+          <div class="flex-row">
+            <div class="flex-cell flex-cell-l">
+              <div class="chart-wrapper">
+                <h3 class="chart-title">参赛人数</h3>
+                <div class="chart-div chart-done">
+                  <div class="chart-loader">
+                    <div class="loader"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex-cell flex-cell-c">
+              <!-- <div class="chart-wrapper">
+                <h3 class="chart-title"></h3>
+                <div class="chart-div"></div>
+              </div> -->
+            </div>
+            <div class="flex-cell flex-cell-r">
+              <div class="chart-wrapper">
+                <h3 class="chart-title">演习周期倒计时</h3>
+                <div class="chart-div chart-done">
+                  <div class="chart-loader">
+                    <div class="loader"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex-row">
+            <div class="flex-cell flex-cell-l">
+              <div class="chart-wrapper">
+                <h3 class="chart-title">演习规模</h3>
+                <div class="chart-div chart-done">
+                  <div class="chart-loader">
+                    <div class="loader"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex-cell flex-cell-c">
+              <!-- <div class="chart-wrapper">
+                <h3 class="chart-title"></h3>
+                <div class="chart-div"></div>
+              </div> -->
+            </div>
+            <div class="flex-cell flex-cell-r">
+              <div class="chart-wrapper">
+                <h3 class="chart-title">失险次数最多单位</h3>
+                <div class="chart-div chart-done">
+                  <div class="chart-loader">
+                    <div class="loader"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex-row bottom">
+            <div class="flex-cell flex-cell-l">
+              <div class="chart-wrapper">
+                <h3 class="chart-title">攻击队伍</h3>
+                <div class="chart-div chart-done">
+                  <div class="chart-loader">
+                    <div class="loader"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex-row flex-cell-c">
+              <div class="flex-cell flex-cell-c">
+                <div class="chart-wrapper">
+                  <h3 class="chart-title">得分趋势</h3>
+                  <div class="chart-div chart-done">
+                    <div class="chart-loader">
+                      <div class="loader"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex-cell flex-cell-c">
+                <div class="chart-wrapper">
+                  <h3 class="chart-title">实时战况</h3>
+                  <div class="chart-div chart-done">
+                    <div class="chart-loader">
+                      <div class="loader"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex-cell flex-cell-r">
+              <div class="chart-wrapper">
+                <h3 class="chart-title">防守队伍</h3>
+                <div class="chart-div chart-done">
+                  <div class="chart-loader">
+                    <div class="loader"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</template>
+
+<style scoped>
+.showTime{
+  position: absolute;
+  top: 10px;
+  right: 40px;
+  font-size: 28px;
+  color: #FFFFFF;
+}
+
+.page-body {
+  height: 100%;
+	position: relative;
+	font-family: "Microsoft Yahei", Arial, sans-serif;
+	background: #050d3c url("./assets/bg.png") 0 0 / 100% 100% no-repeat;
+}
+
+/* layout */
+#header {
+	position: relative;
+	height: 120px;
+	background: url("./assets/header.png") 0 0 / 100% 100% no-repeat;
+	overflow: hidden;
+}
+
+.header-title {
+	line-height: 120px;
+	text-align: center;
+	font-size: 32px;
+	font-weight: 400;
+	color: #bef2ff;
+}
+
+#container {
+	position: absolute;
+	top: 64px;
+	bottom: 15px;
+	left: 0;
+	right: 0;
+}
+
+#flexCon {
+	height: 100%;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-flex-direction: column;
+	-ms-flex-direction: column;
+	flex-direction: column;
+}
+
+.flex-row {
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+}
+
+.flex-cell {
+	/* -webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1; */
+
+  width: 420px;
+	padding: 2px;
+}
+
+/* .flex-cell-l,
+.flex-cell-r {
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
+} */
+
+.flex-cell-c {
+	/* -webkit-flex: 3;
+	-ms-flex: 3; */
+	flex: 2;
+}
+
+
+.chart-wrapper {
+	position: relative;
+	height: 100%;
+  display: flex;
+  flex-direction: column;
+	background-color: rgba(0, 0, 0, .6);
+	border-style: solid;
+	border-width: 26px 27px 27px;
+	border-image: url("./assets/chart-wrapper.png") 26 27 27 fill / 1 / 0 repeat;
+}
+
+.chart-title {
+	/* height: 30px; */
+	font-size: 20px;
+  padding: 4px 0;
+	font-weight: normal;
+	color: #FFFFFF;
+  text-align: center;
+  background: radial-gradient(circle at center, rgba(51, 86, 240, 0.79), rgba(0,0,0, .1));;
+}
+
+.chart-div {
+  flex: 1;
+	/* position: absolute;
+	top: 30px;
+	bottom: 0;
+	left: 0;
+	right: 0; */
+}
+
+/* media query */
+@media (max-width:1900px) {
+	#header {
+		height: 48px;
+	}
+
+	#container {
+		top: 36px;
+		bottom: 10px;
+	}
+
+	.header-title {
+		line-height: 42px;
+		font-size: 22px;
+	}
+
+	.flex-cell {
+		padding: 10px;
+	}
+
+	.chart-title {
+		height: 24px;
+		font-size: 16px;
+	}
+
+	.chart-div {
+		top: 24px;
+	}
+}
+
+/* chart-loader */
+.chart-loader {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 99;
+	width: 100%;
+	height: 100%;
+	background: rgba(255, 255, 255, 0);
+	transition: all .8s;
+}
+
+.chart-loader .loader {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 60px;
+	height: 60px;
+	margin: -30px 0 0 -30px;
+	border: 3px solid transparent;
+	border-top-color: #3498db;
+	border-radius: 50% !important;
+	-webkit-animation: spin 2s linear infinite;
+	animation: spin 2s linear infinite;
+}
+
+.chart-loader .loader:before {
+	content: "";
+	position: absolute;
+	top: 3px;
+	left: 5px;
+	right: 5px;
+	bottom: 5px;
+	border: 3px solid transparent;
+	border-top-color: #e74c3c;
+	border-radius: 50% !important;
+	-webkit-animation: spin 3s linear infinite;
+	animation: spin 3s linear infinite;
+}
+
+.chart-loader .loader:after {
+	content: "";
+	position: absolute;
+	top: 9px;
+	left: 10px;
+	right: 10px;
+	bottom: 10px;
+	border: 3px solid transparent;
+	border-top-color: #f9c922;
+	border-radius: 50% !important;
+	-webkit-animation: spin 1.5s linear infinite;
+	animation: spin 1.5s linear infinite;
+}
+
+.chart-done .chart-loader {
+	display: none;
+}
+
+@-webkit-keyframes spin {
+	0% {
+		-webkit-transform: rotate(0deg);
+		-ms-transform: rotate(0deg);
+		transform: rotate(0deg)
+	}
+
+	100% {
+		-webkit-transform: rotate(360deg);
+		-ms-transform: rotate(360deg);
+		transform: rotate(360deg)
+	}
+}
+
+@keyframes spin {
+	0% {
+		-webkit-transform: rotate(0deg);
+		-ms-transform: rotate(0deg);
+		transform: rotate(0deg)
+	}
+
+	100% {
+		-webkit-transform: rotate(360deg);
+		-ms-transform: rotate(360deg);
+		transform: rotate(360deg)
+	}
+}
+</style>
