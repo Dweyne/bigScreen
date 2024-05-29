@@ -66,11 +66,13 @@ const formattedTime = computed(() => {
   return `${days}天 ${_formatNum(hours)}:  ${_formatNum(minutes)}:  ${_formatNum(seconds)}`;
 });
 
+const attackTeamList = ref(JSON_DATA.attackTeam) // 攻击队伍
+const defendTeamList = ref(JSON_DATA.defendTeam) // 防守队伍
 
 const personChartData = computed(() => {
   return [
-    { name: '攻击队参与人数', value: JSON_DATA.attackTeam.length },
-    { name: '防御队参与人数', value: JSON_DATA.defendTeam.length }
+    { name: '攻击队参与人数', value: attackTeamList.value.length },
+    { name: '防御队参与人数', value: defendTeamList.value.length }
   ]
 })
 
@@ -93,9 +95,9 @@ onMounted(() => {
     
       <div id="container">
         <div id="flexCon">
-          <div class="flex-row">
+          <div class="flex-row flex-1">
             <div class="flex-cell flex-cell-l">
-              <div class="chart-wrapper">
+              <div class="chart-wrapper top">
                 <h3 class="chart-title">参赛人数</h3>
                 <div class="chart-div chart-done chart-people">
                   <person-chart class="person-chart" :echartData="personChartData"></person-chart>
@@ -106,32 +108,9 @@ onMounted(() => {
                       <span>{{ item.value }}</span>
                     </div>
                   </div>
-
-                  <!-- <div class="chart-loader">
-                    <div class="loader"></div>
-                  </div> -->
                 </div>
               </div>
-            </div>
-            <div class="flex-cell flex-cell-c">
-              <!-- <div class="chart-wrapper">
-                <h3 class="chart-title"></h3>
-                <div class="chart-div"></div>
-              </div> -->
-            </div>
-            <div class="flex-cell flex-cell-r">
-              <div class="chart-wrapper">
-                <h3 class="chart-title">演习周期倒计时</h3>
-                <div class="chart-div chart-done">
-                  <div class="time-range">{{ startTime }} ~ {{ endTime }}</div>
-                  <div class="time-count-down">{{ formattedTime }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="flex-row">
-            <div class="flex-cell flex-cell-l">
-              <div class="chart-wrapper">
+              <div class="chart-wrapper flex-1">
                 <h3 class="chart-title">演习规模</h3>
                 <div class="chart-div chart-done">
                   <div class="chart-loader">
@@ -147,7 +126,14 @@ onMounted(() => {
               </div> -->
             </div>
             <div class="flex-cell flex-cell-r">
-              <div class="chart-wrapper">
+              <div class="chart-wrapper top">
+                <h3 class="chart-title">演习周期倒计时</h3>
+                <div class="chart-div chart-done">
+                  <div class="time-range">{{ startTime }} ~ {{ endTime }}</div>
+                  <div class="time-count-down">{{ formattedTime }}</div>
+                </div>
+              </div>
+              <div class="chart-wrapper flex-1">
                 <h3 class="chart-title">失陷次数最多单位</h3>
                 <div class="chart-div chart-done">
                   <div class="chart-loader">
@@ -157,20 +143,42 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <div class="flex-row bottom">
+          <!-- <div class="flex-row">
             <div class="flex-cell flex-cell-l">
+              
+            </div>
+            <div class="flex-cell flex-cell-c">
               <div class="chart-wrapper">
+                <h3 class="chart-title"></h3>
+                <div class="chart-div"></div>
+              </div>
+            </div>
+            <div class="flex-cell flex-cell-r">
+              
+            </div>
+          </div> -->
+          <div class="flex-row bottom" style="height: 300px;">
+            <div class="flex-cell flex-cell-l">
+              <div class="chart-wrapper flex-1">
                 <h3 class="chart-title">攻击队伍</h3>
-                <div class="chart-div chart-done">
-                  <div class="chart-loader">
-                    <div class="loader"></div>
+                <div class="chart-div chart-done team-box">
+                  <div class="team-title team-border">
+                    <span>队伍名称</span>
+                    <span>得分</span>
+                  </div>
+                  <div class="team-item team-border" v-for="(item, index) in attackTeamList" :key="index">
+                    <div>
+                      <img :src="item.img" alt="">
+                      <span> {{ item.name }}</span>
+                    </div>
+                    <div>{{ item.score }}</div>
                   </div>
                 </div>
               </div>
             </div>
             <div class="flex-row flex-cell-c">
               <div class="flex-cell flex-cell-c">
-                <div class="chart-wrapper">
+                <div class="chart-wrapper flex-1">
                   <h3 class="chart-title">得分趋势</h3>
                   <div class="chart-div chart-done">
                     <div class="chart-loader">
@@ -180,7 +188,7 @@ onMounted(() => {
                 </div>
               </div>
               <div class="flex-cell flex-cell-c">
-                <div class="chart-wrapper">
+                <div class="chart-wrapper flex-1">
                   <h3 class="chart-title">实时战况</h3>
                   <div class="chart-div chart-done">
                     <div class="chart-loader">
@@ -191,7 +199,7 @@ onMounted(() => {
               </div>
             </div>
             <div class="flex-cell flex-cell-r">
-              <div class="chart-wrapper">
+              <div class="chart-wrapper flex-1">
                 <h3 class="chart-title">防守队伍</h3>
                 <div class="chart-div chart-done">
                   <div class="chart-loader">
@@ -228,7 +236,10 @@ onMounted(() => {
   text-align: center;
   color: #FFFFFF;
 }
-
+.top{
+  height: 200px;
+  margin-bottom: 4px;
+}
 .chart-people{
   display: flex;
   align-items: center;
@@ -240,10 +251,25 @@ onMounted(() => {
     flex: 1;
     color: #FFFFFF;
     .person-item {
+      font-size: 18px;
       display: flex;
       align-items: center;
+      &::before{
+        content: '';
+        margin-right: 8px;
+        display: inline-block;
+        border-left: 16px solid #0E7CE2; /* 左边框 */
+        border-top: 10px solid transparent; /* 右边框 */
+        border-bottom: 10px solid transparent; /* 底部边框 */
+      }
+      &:not(:last-child) {
+        margin-bottom: 20px;
+        &::before{
+          border-left-color: #FF8352;
+        }
+      }
       .person-seprate {
-        margin: 0 20px;
+        margin: 0 16px;
         width: 12%;
         height: 2px;
         border-radius: 2px;
@@ -253,6 +279,27 @@ onMounted(() => {
   }
 }
 
+.team-box{
+  color: #FFFFFF;
+  .team-title{
+    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    color: #2c40af;
+  }
+  .team-item{
+    font-size: 20px;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+  }
+  .team-border{
+    border-bottom: 1px solid #FFFFFF;
+  }
+}
+
+
 .page-body {
   height: 100%;
 	position: relative;
@@ -260,6 +307,11 @@ onMounted(() => {
 	background: #050d3c url("./assets/bg.png") 0 0 / 100% 100% no-repeat;
 }
 
+.flex-1{
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
+}
 /* layout */
 #header {
 	position: relative;
@@ -295,9 +347,7 @@ onMounted(() => {
 }
 
 .flex-row {
-	-webkit-flex: 1;
-	-ms-flex: 1;
-	flex: 1;
+
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: flex;
@@ -307,28 +357,30 @@ onMounted(() => {
 	/* -webkit-flex: 1;
 	-ms-flex: 1;
 	flex: 1; */
-
+  display: flex;
+  flex-direction: column;
   width: 420px;
 	padding: 2px;
 }
 
-/* .flex-cell-l,
+.flex-cell-l,
 .flex-cell-r {
-	-webkit-flex: 1;
-	-ms-flex: 1;
-	flex: 1;
-} */
+	// -webkit-flex: 2;
+	// -ms-flex: 2;
+	flex: 2;
+} 
 
 .flex-cell-c {
 	/* -webkit-flex: 3;
 	-ms-flex: 3; */
-	flex: 2;
+	flex: 3;
 }
 
 
 .chart-wrapper {
 	position: relative;
-	height: 100%;
+	// height: 100%;
+  // flex: 1;
   display: flex;
   flex-direction: column;
 	background-color: rgba(0, 0, 0, .6);
@@ -357,34 +409,6 @@ onMounted(() => {
 }
 
 /* media query */
-@media (max-width:1900px) {
-	#header {
-		height: 48px;
-	}
-
-	#container {
-		top: 36px;
-		bottom: 10px;
-	}
-
-	.header-title {
-		line-height: 42px;
-		font-size: 22px;
-	}
-
-	.flex-cell {
-		padding: 10px;
-	}
-
-	.chart-title {
-		height: 24px;
-		font-size: 16px;
-	}
-
-	.chart-div {
-		top: 24px;
-	}
-}
 
 /* chart-loader */
 .chart-loader {

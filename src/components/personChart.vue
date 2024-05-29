@@ -52,13 +52,13 @@ let initData = () => {
             textStyle: {
                 rich: {
                     name: {
-                        fontSize: 10,
+                        fontSize: 22,
                         fontWeight: 'normal',
                         color: '#ffffff',
                         padding: [10, 0]
                     },
                     val: {
-                        fontSize: 22,
+                        fontSize: 28,
                         fontWeight: 'bold',
                         color: '#ffffff',
                     }
