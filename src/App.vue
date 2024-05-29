@@ -1,19 +1,18 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import JSON_DATA from './const/data.json'
+import { onMounted, computed, ref } from 'vue';
+import personChart from './components/personChart.vue'
 
-const showTime = ref('')
+let showTime = ref('')
 
-onMounted(() => {
-  setInterval(() => {
-    const time = getTime()
-    showTime.value = time.date + ' ' + time.time + ' ' + time.week
-  }, 1000)
-})
+const startTime = JSON_DATA.date[0]
+const endTime = JSON_DATA.date[1]
+const futureTime = new Date(endTime).getTime();
+const currentTime = ref(new Date().getTime());
 // 格式化
 const _formatNum = (num) => {
   return num < 10 ? '0' + num : num
 }
-
 // 大屏计时器
 const getTime = () => {
   const nowDate = new Date()
@@ -51,6 +50,37 @@ const getTime = () => {
     week
   }
 }
+// 设置大屏时间
+const setTime = () => {
+  const time = getTime()
+  showTime.value = time.date + ' ' + time.time + ' ' + time.week
+}
+// 
+const timeLeft = ref(futureTime - currentTime.value);
+// 倒计时
+const formattedTime = computed(() => {
+  const days = Math.floor(timeLeft.value / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((timeLeft.value % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((timeLeft.value % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((timeLeft.value % (1000 * 60)) / 1000);
+  return `${days}天 ${_formatNum(hours)}:  ${_formatNum(minutes)}:  ${_formatNum(seconds)}`;
+});
+
+
+const personChartData = computed(() => {
+  return [
+    { name: '攻击队参与人数', value: JSON_DATA.attackTeam.length },
+    { name: '防御队参与人数', value: JSON_DATA.defendTeam.length }
+  ]
+})
+
+onMounted(() => {
+  setTime()
+  setInterval(() => {
+    setTime()
+    timeLeft.value = futureTime - new Date().getTime();
+  }, 1000)
+})
 
 </script>
 
@@ -67,10 +97,19 @@ const getTime = () => {
             <div class="flex-cell flex-cell-l">
               <div class="chart-wrapper">
                 <h3 class="chart-title">参赛人数</h3>
-                <div class="chart-div chart-done">
-                  <div class="chart-loader">
-                    <div class="loader"></div>
+                <div class="chart-div chart-done chart-people">
+                  <person-chart class="person-chart" :echartData="personChartData"></person-chart>
+                  <div class="person-list">
+                    <div class="person-item" v-for="item in personChartData" :key="item.name">
+                      <span>{{ item.name }}</span>
+                      <div class="person-seprate"></div>
+                      <span>{{ item.value }}</span>
+                    </div>
                   </div>
+
+                  <!-- <div class="chart-loader">
+                    <div class="loader"></div>
+                  </div> -->
                 </div>
               </div>
             </div>
@@ -84,9 +123,8 @@ const getTime = () => {
               <div class="chart-wrapper">
                 <h3 class="chart-title">演习周期倒计时</h3>
                 <div class="chart-div chart-done">
-                  <div class="chart-loader">
-                    <div class="loader"></div>
-                  </div>
+                  <div class="time-range">{{ startTime }} ~ {{ endTime }}</div>
+                  <div class="time-count-down">{{ formattedTime }}</div>
                 </div>
               </div>
             </div>
@@ -110,7 +148,7 @@ const getTime = () => {
             </div>
             <div class="flex-cell flex-cell-r">
               <div class="chart-wrapper">
-                <h3 class="chart-title">失险次数最多单位</h3>
+                <h3 class="chart-title">失陷次数最多单位</h3>
                 <div class="chart-div chart-done">
                   <div class="chart-loader">
                     <div class="loader"></div>
@@ -168,13 +206,51 @@ const getTime = () => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .showTime{
   position: absolute;
   top: 10px;
   right: 40px;
   font-size: 28px;
   color: #FFFFFF;
+}
+.time-range{
+  font-family: 'tapeworm';
+  color: #FFFFFF;
+  font-size: 23px;
+  padding: 20px;
+  text-align: center;
+  text-shadow: 0px 0px 20px rgba(255, 255, 255, 1);
+}
+.time-count-down{
+  font-family: 'ds-digit';
+  font-size: 32px;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.chart-people{
+  display: flex;
+  align-items: center;
+  .person-chart{
+    width: 36%;
+    margin-right: 20px;
+  }
+  .person-list {
+    flex: 1;
+    color: #FFFFFF;
+    .person-item {
+      display: flex;
+      align-items: center;
+      .person-seprate {
+        margin: 0 20px;
+        width: 12%;
+        height: 2px;
+        border-radius: 2px;
+        background: #FFFFFF
+      }
+    }
+  }
 }
 
 .page-body {
@@ -257,7 +333,7 @@ const getTime = () => {
   flex-direction: column;
 	background-color: rgba(0, 0, 0, .6);
 	border-style: solid;
-	border-width: 26px 27px 27px;
+	border-width: 6px 10px 10px;
 	border-image: url("./assets/chart-wrapper.png") 26 27 27 fill / 1 / 0 repeat;
 }
 

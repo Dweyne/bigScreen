@@ -14,3 +14,17 @@ html, #app, body {
 	min-height: 600px;
 	overflow: hidden;
 }
+
+@font-face {
+  font-family: 'tapeworm';
+  src: url('./assets/fonts/tapeworm.eot');
+  src: url('./assets/fonts/tapeworm.eot?#iefix') format('embedded-opentype'),
+       url('./assets/fonts/tapeworm.ttf') format('truetype'),
+       url('./assets/fonts/tapeworm.svg#tapewormregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face{
+  font-family: 'ds-digit';
+  src: url('./assets/fonts/DS-DIGIT.TTF');
+}
