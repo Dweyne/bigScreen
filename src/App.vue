@@ -1,6 +1,7 @@
 <script setup>
 import JSON_DATA from './const/data.json'
 import { onMounted, computed, ref } from 'vue';
+import SeamlessScroll from "seamless-scroll-v3";
 import personChart from './components/personChart.vue'
 
 let showTime = ref('')
@@ -68,13 +69,15 @@ const formattedTime = computed(() => {
 
 const attackTeamList = ref(JSON_DATA.attackTeam) // 攻击队伍
 const defendTeamList = ref(JSON_DATA.defendTeam) // 防守队伍
-
-const scrollList = () => {
-      setInterval(() => {
-        const firstItem = attackTeamList.value.shift();
-        attackTeamList.value.push(firstItem);
-      }, 2000); // 每隔2秒滚动一次
-    };
+const teamItem = ref(null)
+const classOption = ref({
+    direction: "top",
+    step: 1,
+    singleHeight: 68,
+    limitMoveNum: 3,
+    waitTime: 3000,
+    hoverStop: false
+  });
 
 const personChartData = computed(() => {
   return [
@@ -84,7 +87,7 @@ const personChartData = computed(() => {
 })
 
 onMounted(() => {
-  scrollList()
+  teamItem.value = document.querySelector('.team-item')
   setTime()
   setInterval(() => {
     setTime()
@@ -174,16 +177,17 @@ onMounted(() => {
                   <span>队伍名称</span>
                   <span>得分</span>
                 </div>
-
-                <transition-group name="scroll-list" tag="div">
+                <div class="scroll-box">
+                  <SeamlessScroll ref="scrollRef" :data="attackTeamList" :class-option="classOption" class="warp">
                   <div class="team-item team-border" v-for="(item, index) in attackTeamList" :key="item.id">
-                    <div>
+                    <div class="team-info">
                       <img :src="item.img" alt="">
                       <span> {{ item.name }}</span>
                     </div>
                     <div>{{ item.score }}</div>
                   </div>
-                </transition-group>
+                </SeamlessScroll>
+                </div>
               </div>
             </div>
           </div>
@@ -212,9 +216,21 @@ onMounted(() => {
           <div class="flex-cell flex-cell-r">
             <div class="chart-wrapper flex-1">
               <h3 class="chart-title">防守队伍</h3>
-              <div class="chart-div chart-done">
-                <div class="chart-loader">
-                  <div class="loader"></div>
+              <div class="chart-div chart-done team-box">
+                <div class="team-title team-border">
+                  <span>队伍名称</span>
+                  <span>得分</span>
+                </div>
+                <div class="scroll-box">
+                  <SeamlessScroll ref="scrollRef" :data="defendTeamList" :class-option="classOption" class="warp">
+                  <div class="team-item team-border" v-for="(item, index) in defendTeamList" :key="item.id">
+                    <div class="team-info">
+                      <img :src="item.img" alt="">
+                      <span> {{ item.name }}</span>
+                    </div>
+                    <div>{{ item.score }}</div>
+                  </div>
+                </SeamlessScroll>
                 </div>
               </div>
             </div>
@@ -307,7 +323,8 @@ onMounted(() => {
 
 .team-box {
   color: #FFFFFF;
-
+  display: flex;
+  flex-direction: column;
   .team-title {
     font-size: 16px;
     display: flex;
@@ -315,23 +332,32 @@ onMounted(() => {
     padding: 10px;
     color: #2c40af;
   }
-
+  .scroll-box{
+    flex: 1;
+    overflow: hidden;
+  }
   .team-item {
     font-size: 20px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 10px;
+    box-sizing: border-box;
+    .team-info{
+      display: flex;
+      align-items: center;
+    }
+    img{
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
   }
 
   .team-border {
     border-bottom: 1px solid #FFFFFF;
   }
-}
-.scroll-list-enter-active, .scroll-list-leave-active {
-  transition: transform 1s;
-}
-.scroll-list-enter, .scroll-list-leave-to {
-  transform: translateY(100%);
 }
 
 
@@ -421,6 +447,7 @@ onMounted(() => {
   flex-direction: column;
   background-color: rgba(0, 0, 0, .6);
   border-style: solid;
+  overflow: hidden;
   border-width: 6px 10px 10px;
   border-image: url("./assets/chart-wrapper.png") 26 27 27 fill / 1 / 0 repeat;
 }
