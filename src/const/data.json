@@ -1,5 +1,8 @@
 {
-    "date": ["2024-05-01", "2025-06-06"],
+    "date": [
+        "2024-05-01",
+        "2025-06-06"
+    ],
     "attackTeam": [
         {
             "id": 1,
@@ -16,7 +19,7 @@
         {
             "id": 3,
             "name": "香椿",
-            "score":  1200,
+            "score": 1200,
             "img": "https://img.zcool.cn/community/017bce60001e4e11013f792891b3f0.jpg@1280w_1l_2o_100sh.jpg"
         },
         {
@@ -54,7 +57,7 @@
         {
             "id": "13",
             "name": "叶轻眉",
-            "score":  1200,
+            "score": 1200,
             "img": "https://q7.itc.cn/q_70/images03/20240423/6d236fae5c8f44ed9b60d977f32debb7.jpeg"
         },
         {
@@ -112,7 +115,30 @@
             }
         ]
     },
-    "timeLine": [
-
-    ]
+    "timeLine": [],
+    "moreOffensive": {
+        "name": "西门吹雪",
+        "chartData": [
+            {
+                "name": "东方不败",
+                "sum": 208
+            },
+            {
+                "name": "红鼻子小黑",
+                "sum": 80
+            },
+            {
+                "name": "王德发",
+                "sum": 108
+            },
+            {
+                "name": "钢铁侠",
+                "sum": 80
+            },
+            {
+                "name": "蜘蛛侠",
+                "sum": 108
+            }
+        ]
+    }
 }

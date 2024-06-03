@@ -3,6 +3,8 @@ import JSON_DATA from './const/data.json'
 import { onMounted, computed, ref } from 'vue';
 import SeamlessScroll from "seamless-scroll-v3";
 import personChart from './components/personChart.vue'
+import trendChart from './components/trendChart.vue'
+import bubbleChart from './components/bubbleChart.vue'
 
 let showTime = ref('')
 
@@ -86,7 +88,15 @@ const personChartData = computed(() => {
   ]
 })
 
+
+// 趋势图数据
+const trendChartData = ref(JSON_DATA.trendData)
+
+// 失险次数最多单位数据
+const bubbleChartData = ref(JSON_DATA.moreOffensive.chartData)
+
 onMounted(() => {
+  console.log(bubbleChartData.value);
   teamItem.value = document.querySelector('.team-item')
   setTime()
   setInterval(() => {
@@ -147,9 +157,7 @@ onMounted(() => {
             <div class="chart-wrapper flex-1">
               <h3 class="chart-title">失陷次数最多单位</h3>
               <div class="chart-div chart-done">
-                <div class="chart-loader">
-                  <div class="loader"></div>
-                </div>
+                <bubble-chart :title="'失陷次数最多单位'" :echartData="bubbleChartData"></bubble-chart>
               </div>
             </div>
           </div>
@@ -196,9 +204,7 @@ onMounted(() => {
               <div class="chart-wrapper flex-1">
                 <h3 class="chart-title">得分趋势</h3>
                 <div class="chart-div chart-done">
-                  <div class="chart-loader">
-                    <div class="loader"></div>
-                  </div>
+                  <trend-chart class="trend-chart" :echartData="trendChartData"></trend-chart>
                 </div>
               </div>
             </div>
@@ -421,7 +427,7 @@ onMounted(() => {
 	flex: 1; */
   display: flex;
   flex-direction: column;
-  width: 420px;
+  /* width: 420px; */
   padding: 2px;
 }
 

@@ -5,8 +5,17 @@ import { onMounted, ref } from "vue";
 const timeId = ref(Math.floor(new Date().getTime() * Math.random())); // 使该图表保持唯id
 
 const props = defineProps({
-    echartData: {
-        type: Array
+    xData: {
+        type: Array,
+        default: () => []
+    },
+    defendData: {
+        type: Array,
+        default: () => []
+    },
+    attackData: {
+        type: Array,
+        default: () => []
     }
 })
 
@@ -14,72 +23,134 @@ let myCharts = null;
 let chartsRef = ref(null)
 
 const color = [new echarts.graphic.LinearGradient(
-          0, 0, 0, 1, // 渐变方向
-          [
-            { offset: 0, color: 'rgba(255, 255, 255, 0.3)' },
-            { offset: 1, color: '#0E7CE2' }
-          ]
-        ),new echarts.graphic.LinearGradient(
-          0, 0, 0, 1, // 渐变方向
-          [
-            { offset: 1, color: 'rgba(255, 255, 255, 0.3)' },
-            { offset: 0, color: '#FF8352' }
-          ]
-        )]
+    0, 0, 0, 1, // 渐变方向
+    [
+        { offset: 1, color: 'rgba(0, 0, 0, 0)' },
+        { offset: 0, color: '#0E7CE2' }
+    ]
+), new echarts.graphic.LinearGradient(
+    0, 0, 0, 1, // 渐变方向
+    [
+        { offset: 1, color: 'rgba(0, 0, 0, 0)' },
+        { offset: 0, color: '#FF8352' }
+    ]
+)]
 
-let formatNumber = function(num) {
-    let reg = /(?=(\B)(\d{3})+$)/g;
-    return num.toString().replace(reg, ',');
-}
-let total = props.echartData.reduce((a, b) => {
-    return a + b.value * 1
-}, 0);
 /**
  * 初始化数据
  */
 let initData = () => {
     myCharts = echarts.init(chartsRef.value);
     const option = {
-        // backgroundColor: bgColor,
-        color: color,
-        // tooltip: {
-        //     trigger: 'item'
-        // },
-        title: [{
-            text: '{name|总人数}\n{val|' + formatNumber(total) + '}',
-            top: 'center',
-            left: 'center',
+        legend: {
+            show: true,
+            icon: 'circle',
+            top: '0%',
+            right: 0,
+            itemWidth: 10,
+            itemHeight: 10,
+            itemGap: 25,
             textStyle: {
-                rich: {
-                    name: {
-                        fontSize: 22,
-                        fontWeight: 'normal',
-                        color: '#ffffff',
-                        padding: [10, 0]
-                    },
-                    val: {
-                        fontSize: 28,
-                        fontWeight: 'bold',
-                        color: '#ffffff',
-                    }
+                color: '#ffffff',
+                fontSize: 22
+            }
+        },
+        grid: {
+            top: '20%',
+            left: '0%',
+            right: '20',
+            bottom: '0%',
+            containLabel: true
+        },
+        tooltip: {
+            trigger: 'axis',
+        },
+        xAxis: [{
+            type: 'category',
+            data: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+            axisLine: {
+                lineStyle: {
+                    color: '#ddd'
+                }
+            },
+            axisTick: {
+                show: false
+            },
+            axisLabel: {
+                interval: 0,
+                textStyle: {
+                    color: '#ffffff',
+                    fontSize: 22
+                },
+                margin: 15
+            },
+            boundaryGap: false
+        }],
+        yAxis: [{
+            type: 'value',
+            axisTick: {
+                show: false
+            },
+            axisLine: {
+                show: true,
+                lineStyle: {
+                    color: '#ffffff'
+                }
+            },
+            axisLabel: {
+                textStyle: {
+                    color: '#ffffff',
+                    fontSize: 22
+                }
+            },
+            splitLine: {
+                show: false
+            },
+            splitArea: {
+                show: true,
+                areaStyle: {
+                    color: ["rgba(51, 86, 240, 0.15)", "rgba(250,250,250,0.15)"]
                 }
             }
         }],
         series: [{
-            type: 'pie',
-            radius: ['70%', '80%'],
-            center: ['50%', '50%'],
-            data: props.echartData,
-            hoverAnimation: false,
+            name: '攻击',
+            type: 'line',
+            data: [5, 12, 11, 4, 25, 16, 1],
+            symbolSize: 2,
+            symbol: 'circle',
+            showSymbol: false,
+            smooth: true,
+            lineStyle: {
+                color: '#FF8352'
+            },
             itemStyle: {
-                // borderColor: bgColor,
-                borderWidth: 2,
-                borderRadius: 20
+                color: '#FF8352',
+                borderColor: '#FF8352'
             },
-            label: {
-                show: false,
+            areaStyle: {
+                color: color[1]
             },
-        }]
+        }, {
+            name: '防守',
+            type: 'line',
+            data: [13, 10, 3, 12, 15, 30, 7],
+            symbolSize: 2,
+            symbol: 'circle',
+            showSymbol: false,
+            smooth: true,
+            lineStyle: {
+                color: '#0E7CE2'
+            },
+            itemStyle: {
+                color: '#0E7CE2',
+                borderColor: '#0E7CE2'
+            },
+            areaStyle: {
+                color: color[0]
+            }
+        }
+        ]
     };
 
     myCharts.setOption(option);
