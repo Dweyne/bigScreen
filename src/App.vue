@@ -5,6 +5,7 @@ import SeamlessScroll from "seamless-scroll-v3";
 import personChart from './components/personChart.vue'
 import trendChart from './components/trendChart.vue'
 import bubbleChart from './components/bubbleChart.vue'
+import customScroll from './components/custom-scroll.vue'
 
 let showTime = ref('')
 
@@ -16,6 +17,7 @@ const currentTime = ref(new Date().getTime());
 const _formatNum = (num) => {
   return num < 10 ? '0' + num : num
 }
+
 // 大屏计时器
 const getTime = () => {
   const nowDate = new Date()
@@ -69,17 +71,23 @@ const formattedTime = computed(() => {
   return `${days}天 ${_formatNum(hours)}:  ${_formatNum(minutes)}:  ${_formatNum(seconds)}`;
 });
 
+// 实施战况
+const scrollListArr = ref(JSON_DATA.timeLine)
+
+// 演习规模数据
+const exerciseScale = ref(JSON_DATA.scale)
+
 const attackTeamList = ref(JSON_DATA.attackTeam) // 攻击队伍
 const defendTeamList = ref(JSON_DATA.defendTeam) // 防守队伍
 const teamItem = ref(null)
 const classOption = ref({
-    direction: "top",
-    step: 1,
-    singleHeight: 68,
-    limitMoveNum: 3,
-    waitTime: 3000,
-    hoverStop: false
-  });
+  direction: "top",
+  step: 1,
+  singleHeight: 68,
+  limitMoveNum: 3,
+  waitTime: 3000,
+  hoverStop: false
+});
 
 const personChartData = computed(() => {
   return [
@@ -133,9 +141,38 @@ onMounted(() => {
             </div>
             <div class="chart-wrapper flex-1">
               <h3 class="chart-title">演习规模</h3>
-              <div class="chart-div chart-done">
-                <div class="chart-loader">
-                  <div class="loader"></div>
+              <div class="chart-div chart-done exercise-scale flex flex-column">
+                <div class="flex-1 flex">
+                  <div class="scale-item flex-1 flex align-center justify-between">
+                    <img src="./assets/attack.png" alt="attack">
+                    <div class="scale-item__text">
+                      <div class="scale-item__num">{{ exerciseScale.attack }}</div>
+                      <div>攻击</div>
+                    </div>
+                  </div>
+                  <div class="scale-item flex-1 flex align-center justify-between">
+                    <img src="./assets/sector.png" alt="sector">
+                    <div class="scale-item__text">
+                      <div class="scale-item__num">{{ exerciseScale.sector }}</div>
+                      <div>行业</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex-1 flex">
+                  <div class="scale-item flex-1 flex align-center justify-between">
+                    <img src="./assets/referee.png" alt="referee">
+                    <div class="scale-item__text">
+                      <div class="scale-item__num">{{ exerciseScale.referee }}</div>
+                      <div>裁判</div>
+                    </div>
+                  </div>
+                  <div class="scale-item flex-1 flex align-center justify-between">
+                    <img src="./assets/defend.png" alt="defend">
+                    <div class="scale-item__text">
+                      <div class="scale-item__num">{{ exerciseScale.defend }}</div>
+                      <div>防守</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -186,15 +223,15 @@ onMounted(() => {
                   <span>得分</span>
                 </div>
                 <div class="scroll-box">
-                  <SeamlessScroll ref="scrollRef" :data="attackTeamList" :class-option="classOption" class="warp">
-                  <div class="team-item team-border" v-for="(item, index) in attackTeamList" :key="item.id">
-                    <div class="team-info">
-                      <img :src="item.img" alt="">
-                      <span> {{ item.name }}</span>
+                  <custom-scroll :scrollListArr="attackTeamList">
+                    <div class="team-item team-border" v-for="(item, index) in attackTeamList" :key="item.id">
+                      <div class="team-info">
+                        <img :src="item.img" alt="">
+                        <span> {{ item.name }}</span>
+                      </div>
+                      <div>{{ item.score }}</div>
                     </div>
-                    <div>{{ item.score }}</div>
-                  </div>
-                </SeamlessScroll>
+                  </custom-scroll>
                 </div>
               </div>
             </div>
@@ -212,9 +249,11 @@ onMounted(() => {
               <div class="chart-wrapper flex-1">
                 <h3 class="chart-title">实时战况</h3>
                 <div class="chart-div chart-done">
-                  <div class="chart-loader">
-                    <div class="loader"></div>
-                  </div>
+                  <custom-scroll :scrollListArr="scrollListArr">
+                    <div class="real-time-item" v-for="(item, index) in scrollListArr" :key="item.id">
+                      <div>{{ item.name }}</div>
+                    </div>
+                  </custom-scroll>
                 </div>
               </div>
             </div>
@@ -228,15 +267,15 @@ onMounted(() => {
                   <span>得分</span>
                 </div>
                 <div class="scroll-box">
-                  <SeamlessScroll ref="scrollRef" :data="defendTeamList" :class-option="classOption" class="warp">
-                  <div class="team-item team-border" v-for="(item, index) in defendTeamList" :key="item.id">
-                    <div class="team-info">
-                      <img :src="item.img" alt="">
-                      <span> {{ item.name }}</span>
+                  <custom-scroll :scrollListArr="defendTeamList">
+                    <div class="team-item team-border" v-for="(item, index) in defendTeamList" :key="item.id">
+                      <div class="team-info">
+                        <img :src="item.img" alt="">
+                        <span> {{ item.name }}</span>
+                      </div>
+                      <div>{{ item.score }}</div>
                     </div>
-                    <div>{{ item.score }}</div>
-                  </div>
-                </SeamlessScroll>
+                  </custom-scroll>
                 </div>
               </div>
             </div>
@@ -277,6 +316,26 @@ onMounted(() => {
   margin-bottom: 4px;
 }
 
+.exercise-scale {
+  img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .scale-item {
+    &__text {
+      color: #FFFFFF;
+      font-size: 18px;
+      margin-right: 20px;
+      text-align: center
+    }
+
+    &__num {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+  }
+}
 
 .chart-people {
   display: flex;
@@ -331,6 +390,7 @@ onMounted(() => {
   color: #FFFFFF;
   display: flex;
   flex-direction: column;
+
   .team-title {
     font-size: 16px;
     display: flex;
@@ -338,10 +398,12 @@ onMounted(() => {
     padding: 10px;
     color: #2c40af;
   }
-  .scroll-box{
+
+  .scroll-box {
     flex: 1;
     overflow: hidden;
   }
+
   .team-item {
     font-size: 20px;
     display: flex;
@@ -349,11 +411,13 @@ onMounted(() => {
     align-items: center;
     padding: 10px;
     box-sizing: border-box;
-    .team-info{
+
+    .team-info {
       display: flex;
       align-items: center;
     }
-    img{
+
+    img {
       width: 30px;
       height: 30px;
       border-radius: 50%;

@@ -15,6 +15,26 @@ html, #app, body {
 	overflow: hidden;
 }
 
+.flex{
+  display: flex;
+}
+.flex-column{
+  flex-direction: column;
+}
+.flex-1{
+  flex: 1;
+}
+.justify-center{
+  justify-content: center;
+}
+.align-center{  
+  align-items: center;
+}
+.justify-between{
+  justify-content: space-between;
+}
+
+
 @font-face {
   font-family: 'tapeworm';
   src: url('./assets/fonts/tapeworm.eot');
