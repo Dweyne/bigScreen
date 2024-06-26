@@ -5,19 +5,15 @@ import { onMounted, ref } from "vue";
 const timeId = ref(Math.floor(new Date().getTime() * Math.random())); // 使该图表保持唯id
 
 const props = defineProps({
-    xData: {
-        type: Array,
-        default: () => []
-    },
-    defendData: {
-        type: Array,
-        default: () => []
-    },
-    attackData: {
-        type: Array,
-        default: () => []
+    echartData: {
+        type: Object,
+        default: () => ({})
     }
 })
+
+const xData = ref([])
+const defendData = ref([])
+const attackData = ref([])
 
 let myCharts = null;
 let chartsRef = ref(null)
@@ -39,7 +35,18 @@ const color = [new echarts.graphic.LinearGradient(
 /**
  * 初始化数据
  */
-let initData = () => {
+const initData = () => {
+    const defend = props.echartData.defend || []
+    const attack = props.echartData.attack || []
+    console.log('defend :>> ', defend,props.echartData);
+    xData.value = defend.map(item => item.x)
+    defendData.value = defend.map(item => item.y)
+    attackData.value = attack.map(item => item.y)
+}
+/**
+ * 初始化chart
+ */
+const initChart = () => {
     myCharts = echarts.init(chartsRef.value);
     const option = {
         legend: {
@@ -58,7 +65,7 @@ let initData = () => {
         grid: {
             top: '20%',
             left: '0%',
-            right: '20',
+            right: '40',
             bottom: '0%',
             containLabel: true
         },
@@ -67,7 +74,7 @@ let initData = () => {
         },
         xAxis: [{
             type: 'category',
-            data: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+            data: xData.value,
             axisLine: {
                 lineStyle: {
                     color: '#ddd'
@@ -116,7 +123,7 @@ let initData = () => {
         series: [{
             name: '攻击',
             type: 'line',
-            data: [5, 12, 11, 4, 25, 16, 1],
+            data: attackData.value,
             symbolSize: 2,
             symbol: 'circle',
             showSymbol: false,
@@ -134,7 +141,7 @@ let initData = () => {
         }, {
             name: '防守',
             type: 'line',
-            data: [13, 10, 3, 12, 15, 30, 7],
+            data: defendData.value,
             symbolSize: 2,
             symbol: 'circle',
             showSymbol: false,
@@ -159,6 +166,7 @@ let initData = () => {
 
 onMounted(_ => {
     initData()
+    initChart()
 })
 </script>
 <template>

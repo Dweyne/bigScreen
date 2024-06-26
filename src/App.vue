@@ -1,11 +1,22 @@
 <script setup>
 import JSON_DATA from './const/data.json'
 import { onMounted, computed, ref } from 'vue';
-import SeamlessScroll from "seamless-scroll-v3";
 import personChart from './components/personChart.vue'
 import trendChart from './components/trendChart.vue'
 import bubbleChart from './components/bubbleChart.vue'
 import customScroll from './components/custom-scroll.vue'
+
+// 加载背景 js
+function loadExternalScript() {
+  const script = document.createElement('script');
+  script.src = 'src/utils/bg.js';
+  script.async = true;
+  script.onload = () => {
+    console.log('External script has been loaded!');
+    // 在脚本加载完成后可以执行需要的操作
+  };
+  document.head.appendChild(script);
+}
 
 let showTime = ref('')
 
@@ -80,14 +91,6 @@ const exerciseScale = ref(JSON_DATA.scale)
 const attackTeamList = ref(JSON_DATA.attackTeam) // 攻击队伍
 const defendTeamList = ref(JSON_DATA.defendTeam) // 防守队伍
 const teamItem = ref(null)
-const classOption = ref({
-  direction: "top",
-  step: 1,
-  singleHeight: 68,
-  limitMoveNum: 3,
-  waitTime: 3000,
-  hoverStop: false
-});
 
 const personChartData = computed(() => {
   return [
@@ -105,6 +108,8 @@ const bubbleChartData = ref(JSON_DATA.moreOffensive.chartData)
 
 onMounted(() => {
   console.log(bubbleChartData.value);
+  loadExternalScript(); // 引入背景 js
+
   teamItem.value = document.querySelector('.team-item')
   setTime()
   setInterval(() => {
@@ -143,14 +148,14 @@ onMounted(() => {
               <h3 class="chart-title">演习规模</h3>
               <div class="chart-div chart-done exercise-scale flex flex-column">
                 <div class="flex-1 flex">
-                  <div class="scale-item flex-1 flex align-center justify-between">
+                  <div class="scale-item flex-1 flex align-center">
                     <img src="./assets/attack.png" alt="attack">
                     <div class="scale-item__text">
                       <div class="scale-item__num">{{ exerciseScale.attack }}</div>
                       <div>攻击</div>
                     </div>
                   </div>
-                  <div class="scale-item flex-1 flex align-center justify-between">
+                  <div class="scale-item flex-1 flex align-center">
                     <img src="./assets/sector.png" alt="sector">
                     <div class="scale-item__text">
                       <div class="scale-item__num">{{ exerciseScale.sector }}</div>
@@ -159,14 +164,14 @@ onMounted(() => {
                   </div>
                 </div>
                 <div class="flex-1 flex">
-                  <div class="scale-item flex-1 flex align-center justify-between">
+                  <div class="scale-item flex-1 flex align-center">
                     <img src="./assets/referee.png" alt="referee">
                     <div class="scale-item__text">
                       <div class="scale-item__num">{{ exerciseScale.referee }}</div>
                       <div>裁判</div>
                     </div>
                   </div>
-                  <div class="scale-item flex-1 flex align-center justify-between">
+                  <div class="scale-item flex-1 flex align-center">
                     <img src="./assets/defend.png" alt="defend">
                     <div class="scale-item__text">
                       <div class="scale-item__num">{{ exerciseScale.defend }}</div>
@@ -229,14 +234,14 @@ onMounted(() => {
                         <img :src="item.img" alt="">
                         <span> {{ item.name }}</span>
                       </div>
-                      <div>{{ item.score }}</div>
+                      <div class="score">{{ item.score }}</div>
                     </div>
                   </custom-scroll>
                 </div>
               </div>
             </div>
           </div>
-          <div class="flex-row flex-cell-c">
+          <div class="flex-row flex-5">
             <div class="flex-cell flex-cell-c">
               <div class="chart-wrapper flex-1">
                 <h3 class="chart-title">得分趋势</h3>
@@ -249,9 +254,13 @@ onMounted(() => {
               <div class="chart-wrapper flex-1">
                 <h3 class="chart-title">实时战况</h3>
                 <div class="chart-div chart-done">
-                  <custom-scroll :scrollListArr="scrollListArr">
+                  <custom-scroll :scrollListArr="scrollListArr" direction="down">
                     <div class="real-time-item" v-for="(item, index) in scrollListArr" :key="item.id">
-                      <div>{{ item.name }}</div>
+                      <div>
+                        <div class="time">{{ item.time }}</div>
+                        <div class="name">{{ item.name }}</div>
+                      </div>
+                      <div class="success">成功</div>
                     </div>
                   </custom-scroll>
                 </div>
@@ -273,7 +282,7 @@ onMounted(() => {
                         <img :src="item.img" alt="">
                         <span> {{ item.name }}</span>
                       </div>
-                      <div>{{ item.score }}</div>
+                      <div class="score">{{ item.score }}</div>
                     </div>
                   </custom-scroll>
                 </div>
@@ -283,10 +292,25 @@ onMounted(() => {
         </div>
       </div>
     </div>
-  </div>
+    <canvas id="canvas"></canvas> 
+
+    </div>
 </template>
 
 <style scoped lang="scss">
+#canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.flex-5{
+  flex: 5;
+}
+
 .showTime {
   position: absolute;
   top: 10px;
@@ -323,6 +347,7 @@ onMounted(() => {
   }
 
   .scale-item {
+    justify-content: space-around;
     &__text {
       color: #FFFFFF;
       font-size: 18px;
@@ -423,13 +448,36 @@ onMounted(() => {
       border-radius: 50%;
       margin-right: 10px;
     }
+    .score {
+      color: rgb(59, 153, 94);
+    }
   }
-
+    
   .team-border {
     border-bottom: 1px solid #FFFFFF;
   }
 }
 
+.real-time-item{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  font-size: 20px;
+  color: #FFFFFF;
+  border-bottom: 1px solid #FFFFFF;
+  .time{
+    color: rgb(65, 103, 164);
+  }
+  .success{
+    color: rgb(59, 153, 94);
+    text-shadow: 0 0 20px rgb(114, 255, 166);
+  }
+}
+
+#header, #container {
+  // display: none;
+}
 
 .page-body {
   height: 100%;
@@ -450,6 +498,7 @@ onMounted(() => {
   height: 120px;
   background: url("./assets/header.png") 0 0 / 100% 100% no-repeat;
   overflow: hidden;
+  z-index: 1;
 }
 
 .header-title {
@@ -466,6 +515,7 @@ onMounted(() => {
   bottom: 15px;
   left: 0;
   right: 0;
+  z-index: 1;
 }
 
 #flexCon {
@@ -535,6 +585,7 @@ onMounted(() => {
 
 .chart-div {
   flex: 1;
+  overflow: hidden;
   /* position: absolute;
 	top: 30px;
 	bottom: 0;
