@@ -1,11 +1,44 @@
 <script setup>
-import JSON_DATA from './const/data.json'
+// import JSON_DATA from '/src/const/data.json'
 import { onMounted, computed, ref } from 'vue';
 import personChart from './components/personChart.vue'
 import trendChart from './components/trendChart.vue'
 import bubbleChart from './components/bubbleChart.vue'
 import customScroll from './components/custom-scroll.vue'
+// import './utils/bg.js'
 
+let JSON_DATA = {}
+const getData = () => {
+  return new Promise((resolve, reject) => {
+    fetch('http://114.132.204.164/data.json')
+      .then(response => response.json())
+      .then(data => {
+        // 更新页面使用的数据
+        console.log(data);
+        JSON_DATA = data
+        initData()
+        resolve()
+      })
+      .catch(error => {
+        console.error('Error fetching JSON:', error);
+        reject(error)
+      })
+
+  })
+}
+// await getData()
+const initData = () => {
+  startTime.value = JSON_DATA.date[0]
+  endTime.value = JSON_DATA.date[1]
+  futureTime.value = new Date(endTime.value).getTime();
+  scrollListArr.value = JSON_DATA.timeLine
+  exerciseScale.value = JSON_DATA.scale
+  attackTeamList.value = JSON_DATA.attackTeam
+  defendTeamList.value = JSON_DATA.defendTeam
+  trendChartData.value = JSON_DATA.trendData
+  bubbleChartData.value = JSON_DATA.moreOffensive.chartData
+}
+console.log('datajson :>> ', JSON_DATA);
 // 加载背景 js
 function loadExternalScript() {
   const script = document.createElement('script');
@@ -20,9 +53,9 @@ function loadExternalScript() {
 
 let showTime = ref('')
 
-const startTime = JSON_DATA.date[0]
-const endTime = JSON_DATA.date[1]
-const futureTime = new Date(endTime).getTime();
+const startTime = ref('')
+const endTime = ref('')
+const futureTime = ref('');
 const currentTime = ref(new Date().getTime());
 // 格式化
 const _formatNum = (num) => {
@@ -72,7 +105,7 @@ const setTime = () => {
   showTime.value = time.date + ' ' + time.time + ' ' + time.week
 }
 // 
-const timeLeft = ref(futureTime - currentTime.value);
+const timeLeft = ref(futureTime.value - currentTime.value);
 // 倒计时
 const formattedTime = computed(() => {
   const days = Math.floor(timeLeft.value / (1000 * 60 * 60 * 24));
@@ -83,38 +116,43 @@ const formattedTime = computed(() => {
 });
 
 // 实施战况
-const scrollListArr = ref(JSON_DATA.timeLine)
+const scrollListArr = ref([])
 
 // 演习规模数据
-const exerciseScale = ref(JSON_DATA.scale)
+const exerciseScale = ref({})
 
-const attackTeamList = ref(JSON_DATA.attackTeam) // 攻击队伍
-const defendTeamList = ref(JSON_DATA.defendTeam) // 防守队伍
+const attackTeamList = ref([]) // 攻击队伍
+const defendTeamList = ref([]) // 防守队伍
 const teamItem = ref(null)
 
 const personChartData = computed(() => {
+  if(!attackTeamList.value.length || !defendTeamList.value.length){
+     return null
+  }
   return [
-    { name: '攻击队参与人数', value: attackTeamList.value.length },
-    { name: '防御队参与人数', value: defendTeamList.value.length }
+    { name: '攻击队数量', value: attackTeamList.value.length },
+    { name: '防御队数量', value: defendTeamList.value.length }
   ]
 })
 
 
 // 趋势图数据
-const trendChartData = ref(JSON_DATA.trendData)
+const trendChartData = ref(null)
 
 // 失险次数最多单位数据
-const bubbleChartData = ref(JSON_DATA.moreOffensive.chartData)
+const bubbleChartData = ref(null)
 
-onMounted(() => {
+onMounted(async () => {
+  await getData()
   console.log(bubbleChartData.value);
   loadExternalScript(); // 引入背景 js
 
   teamItem.value = document.querySelector('.team-item')
+  timeLeft.value = futureTime.value - new Date().getTime();
   setTime()
   setInterval(() => {
     setTime()
-    timeLeft.value = futureTime - new Date().getTime();
+    timeLeft.value = futureTime.value - new Date().getTime();
   }, 1000)
 })
 
@@ -134,7 +172,7 @@ onMounted(() => {
             <div class="chart-wrapper top">
               <h3 class="chart-title">参赛人数</h3>
               <div class="chart-div chart-done chart-people">
-                <person-chart class="person-chart" :echartData="personChartData"></person-chart>
+                <person-chart v-if="personChartData" class="person-chart" :echartData="personChartData"></person-chart>
                 <div class="person-list">
                   <div class="person-item" v-for="item in personChartData" :key="item.name">
                     <span>{{ item.name }}</span>
@@ -199,7 +237,7 @@ onMounted(() => {
             <div class="chart-wrapper flex-1">
               <h3 class="chart-title">失陷次数最多单位</h3>
               <div class="chart-div chart-done">
-                <bubble-chart :title="'失陷次数最多单位'" :echartData="bubbleChartData"></bubble-chart>
+                <bubble-chart v-if="bubbleChartData" :title="'失陷次数最多单位'" :echartData="bubbleChartData"></bubble-chart>
               </div>
             </div>
           </div>
@@ -246,7 +284,7 @@ onMounted(() => {
               <div class="chart-wrapper flex-1">
                 <h3 class="chart-title">得分趋势</h3>
                 <div class="chart-div chart-done">
-                  <trend-chart class="trend-chart" :echartData="trendChartData"></trend-chart>
+                  <trend-chart v-if="trendChartData" class="trend-chart" :echartData="trendChartData"></trend-chart>
                 </div>
               </div>
             </div>

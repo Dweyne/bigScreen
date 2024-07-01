@@ -13,19 +13,22 @@ const props = defineProps({
 let myCharts = null;
 let chartsRef = ref(null)
 
-const color = [new echarts.graphic.LinearGradient(
+const color = [
+        new echarts.graphic.LinearGradient(
+        0, 0, 0, 1, // 渐变方向
+        [
+            { offset: 1, color: 'rgba(255, 255, 255, 0.3)' },
+            { offset: 0, color: '#FF8352' }
+        ]
+        ),
+        new echarts.graphic.LinearGradient(
           0, 0, 0, 1, // 渐变方向
           [
             { offset: 0, color: 'rgba(255, 255, 255, 0.3)' },
             { offset: 1, color: '#0E7CE2' }
           ]
-        ),new echarts.graphic.LinearGradient(
-          0, 0, 0, 1, // 渐变方向
-          [
-            { offset: 1, color: 'rgba(255, 255, 255, 0.3)' },
-            { offset: 0, color: '#FF8352' }
-          ]
-        )]
+        )
+    ]
 
 let formatNumber = function(num) {
     let reg = /(?=(\B)(\d{3})+$)/g;
