@@ -1,7 +1,7 @@
 <script setup>
 
 import * as echarts from 'echarts'
-import { onMounted, ref } from "vue";
+import { onMounted, ref, onBeforeUnmount, shallowRef } from "vue";
 const timeId = ref(Math.floor(new Date().getTime() * Math.random())); // 使该图表保持唯id
 
 const props = defineProps({
@@ -11,11 +11,18 @@ const props = defineProps({
     }
 })
 
+const data = ref([])
 const xData = ref([])
 const defendData = ref([])
 const attackData = ref([])
 
-let myCharts = null;
+const currentIndex = ref(0);
+const intervalId = ref(null);
+const tooltipIntervalId = ref(null);
+const tooltipIndex = ref(0);
+const dataZoomConfig = ref({ start: 0, end: 4 });
+
+const myCharts = shallowRef(null);
 let chartsRef = ref(null)
 
 const color = [new echarts.graphic.LinearGradient(
@@ -39,7 +46,10 @@ const initData = () => {
     const defend = props.echartData.defend || []
     const attack = props.echartData.attack || []
     console.log('defend :>> ', defend,props.echartData);
-    xData.value = defend.map(item => item.x)
+    xData.value = defend.map(item => {
+        data.value.push(Math.random() * 100);
+        return item.x
+    })
     defendData.value = defend.map(item => item.y)
     attackData.value = attack.map(item => item.y)
 }
@@ -47,7 +57,7 @@ const initData = () => {
  * 初始化chart
  */
 const initChart = () => {
-    myCharts = echarts.init(chartsRef.value);
+    myCharts.value = echarts.init(chartsRef.value);
     const option = {
         legend: {
             show: true,
@@ -87,9 +97,13 @@ const initChart = () => {
                 interval: 0,
                 textStyle: {
                     color: '#ffffff',
-                    fontSize: 22
+                    fontSize: 16
                 },
-                margin: 15
+                margin: 15,
+                formatter: function (value) {
+                // 使用\n实现文本的换行
+                return value.split(' ').join('\n');
+            }
             },
             boundaryGap: false
         }],
@@ -120,6 +134,9 @@ const initChart = () => {
                 }
             }
         }],
+        // dataZoom: {
+        //     show: false
+        // },
         series: [{
             name: '攻击',
             type: 'line',
@@ -159,15 +176,81 @@ const initChart = () => {
         }
         ]
     };
-
-    myCharts.setOption(option);
+    myCharts.value.setOption(option);
 }
 
+const updateData = () => {
+  // 更新数据，实现循环滚动
+  const firstX = xData.value.shift();
+  data.value.shift();
+  currentIndex.value++;
+  xData.value.push(firstX + xData.value.length);
+  data.value.push(Math.random() * 100);
+
+  // 更新 dataZoom 组件
+  const end = (dataZoomConfig.value.end + 4) % data.value.length;
+  const start = end - data.value.length < 0 ? 0 : end - data.value.length;
+  dataZoomConfig.value.start = start;
+  dataZoomConfig.value.end = end;
+
+  // 更新图表
+  myCharts.value.setOption({
+    xAxis: {
+      data: xData.value,
+    },
+    series: [
+      {
+        data: attackData.value,
+      },
+      {
+        data: defendData.value
+      }
+    ],
+    dataZoom: [
+      {
+        start: dataZoomConfig.value.start,
+        end: dataZoomConfig.value.end,
+      },
+    ],
+  });
+};
+
+const startScrolling = () => {
+  intervalId.value = setInterval(() => {
+    updateData();
+  }, 12000); // 每秒更新一次
+};
+
+const startTooltip = () => {
+    tooltipIntervalId.value = setInterval(() => {
+        // console.log(tooltipIndex.value);
+        myCharts.value.dispatchAction({
+            type: 'showTip',
+            seriesIndex: 1,
+            dataIndex: tooltipIndex.value,
+        });
+        tooltipIndex.value = (tooltipIndex.value + 1) % xData.value.length;
+        if (tooltipIndex.value > xData.value.length) {
+            tooltipIndex.value = 0;
+        }
+    }, 3000); // 每秒显示下一个 tooltip
+};
 
 onMounted(_ => {
     initData()
     initChart()
+    // startScrolling();
+    startTooltip();
 })
+onBeforeUnmount(() => {
+  // 清除定时器
+  if (intervalId.value) {
+    clearInterval(intervalId.value);
+  }
+  if (tooltipIntervalId.value) {
+    clearInterval(tooltipIntervalId.value);
+  }
+});
 </script>
 <template>
     <div class="chart-container">

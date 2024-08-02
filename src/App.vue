@@ -33,8 +33,8 @@ const initData = () => {
   futureTime.value = new Date(endTime.value).getTime();
   scrollListArr.value = JSON_DATA.timeLine
   exerciseScale.value = JSON_DATA.scale
-  attackTeamList.value = JSON_DATA.attackTeam
-  defendTeamList.value = JSON_DATA.defendTeam
+  attackTeamList.value = JSON_DATA.attackTeam.sort((a,b) => b.score - a.score)
+  defendTeamList.value = JSON_DATA.defendTeam.sort((a,b) => b.score - a.score)
   trendChartData.value = JSON_DATA.trendData
   bubbleChartData.value = JSON_DATA.moreOffensive.chartData
 }
@@ -144,8 +144,9 @@ const bubbleChartData = ref(null)
 
 onMounted(async () => {
   await getData()
+  // initData()
   console.log(bubbleChartData.value);
-  loadExternalScript(); // 引入背景 js
+  // loadExternalScript(); // 引入背景 js
 
   teamItem.value = document.querySelector('.team-item')
   timeLeft.value = futureTime.value - new Date().getTime();
@@ -267,13 +268,16 @@ onMounted(async () => {
                 </div>
                 <div class="scroll-box">
                   <custom-scroll :scrollListArr="attackTeamList">
-                    <div class="team-item team-border" v-for="(item, index) in attackTeamList" :key="item.id">
-                      <div class="team-info">
-                        <img :src="item.img" alt="">
-                        <span> {{ item.name }}</span>
+                    <div class="team-item" v-for="(item, index) in attackTeamList" :key="item.id">
+                      <div class="team-border " v-show="item.name">
+                        <div class="team-info">
+                          <img :src="item.img" alt="">
+                          <span> {{ item.name }}</span>
+                        </div>
+                        <div class="score">{{ item.score }}</div>
                       </div>
-                      <div class="score">{{ item.score }}</div>
                     </div>
+                    <div class="team-gap"></div>
                   </custom-scroll>
                 </div>
               </div>
@@ -315,13 +319,16 @@ onMounted(async () => {
                 </div>
                 <div class="scroll-box">
                   <custom-scroll :scrollListArr="defendTeamList">
-                    <div class="team-item team-border" v-for="(item, index) in defendTeamList" :key="item.id">
-                      <div class="team-info">
-                        <img :src="item.img" alt="">
-                        <span> {{ item.name }}</span>
+                    <div class="team-item" v-for="(item, index) in defendTeamList" :key="item.id">
+                      <div class="team-border" v-show="item.name">
+                        <div class="team-info">
+                          <img :src="item.img" alt="">
+                          <span> {{ item.name }}</span>
+                        </div>
+                        <div class="score">{{ item.score }}</div>
                       </div>
-                      <div class="score">{{ item.score }}</div>
                     </div>
+                    <div class="team-gap"></div>
                   </custom-scroll>
                 </div>
               </div>
@@ -466,15 +473,15 @@ onMounted(async () => {
     flex: 1;
     overflow: hidden;
   }
-
+  .team-gap{
+    padding: 40px 0;
+  }
   .team-item {
     font-size: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
     box-sizing: border-box;
-
+    &:first-of-type{
+      border-top: 1px solid #FFFFFF;
+    }
     .team-info {
       display: flex;
       align-items: center;
@@ -490,8 +497,11 @@ onMounted(async () => {
       color: rgb(59, 153, 94);
     }
   }
-    
   .team-border {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     border-bottom: 1px solid #FFFFFF;
   }
 }
@@ -508,6 +518,7 @@ onMounted(async () => {
     color: rgb(65, 103, 164);
   }
   .success{
+    flex-shrink: 0;
     color: rgb(59, 153, 94);
     text-shadow: 0 0 20px rgb(114, 255, 166);
   }

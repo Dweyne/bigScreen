@@ -48,6 +48,14 @@ const getData = _ => {
                             fontSize: 22,
                             color: '#fff',
                         },
+                        formatter: function(params){
+                            let name = params.name
+                            if(name.length > 5){
+                                name = name.slice(0, 5) + '\n' + name.slice(5)
+                            }
+                            console.log(name);
+                            return `${name}`
+                        }
                     },
                 },
                 itemStyle: {
