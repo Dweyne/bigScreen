@@ -9,8 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dataview/datav-vue3": "^0.0.0-test.1672506674342",
     "@rollup/plugin-json": "^6.1.0",
     "echarts": "^5.5.0",
+    "v-scale-screen": "^2.3.0",
     "vue": "^3.4.21",
     "vue3-seamless-scroll": "^2.0.1"
   },

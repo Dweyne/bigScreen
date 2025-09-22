@@ -6,6 +6,9 @@ import json from '@rollup/plugin-json';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  optimizeDeps: {
+    include: ['@dataview/datav-vue3']
+  },
   plugins: [
     vue(),
     // json({

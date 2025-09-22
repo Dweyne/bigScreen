@@ -5,8 +5,8 @@ import personChart from './components/personChart.vue'
 import trendChart from './components/trendChart.vue'
 import bubbleChart from './components/bubbleChart.vue'
 import customScroll from './components/custom-scroll.vue'
+import { BorderBox1, BorderBox8 } from '@dataview/datav-vue3';
 // import './utils/bg.js'
-
 let JSON_DATA = {}
 const getData = () => {
   return new Promise((resolve, reject) => {
@@ -99,6 +99,9 @@ const getTime = () => {
     week
   }
 }
+const time = computed(_=>{
+
+})
 // 设置大屏时间
 const setTime = () => {
   const time = getTime()
@@ -143,10 +146,10 @@ const trendChartData = ref(null)
 const bubbleChartData = ref(null)
 
 onMounted(async () => {
-  await getData()
-  // initData()
+  // await getData()
+  initData()
   console.log(bubbleChartData.value);
-  // loadExternalScript(); // 引入背景 js
+  loadExternalScript(); // 引入背景 js
 
   teamItem.value = document.querySelector('.team-item')
   timeLeft.value = futureTime.value - new Date().getTime();
@@ -222,6 +225,7 @@ onMounted(async () => {
             </div>
           </div>
           <div class="flex-cell flex-cell-c">
+            <BorderBox8 />
             <!-- <div class="chart-wrapper">
                 <h3 class="chart-title"></h3>
                 <div class="chart-div"></div>
@@ -229,11 +233,13 @@ onMounted(async () => {
           </div>
           <div class="flex-cell flex-cell-r">
             <div class="chart-wrapper top">
-              <h3 class="chart-title">演习周期倒计时</h3>
-              <div class="chart-div chart-done">
-                <div class="time-range">{{ startTime }} ~ {{ endTime }}</div>
-                <div class="time-count-down">{{ formattedTime }}</div>
-              </div>
+              <BorderBox1 height="100%" width="100%">
+                <h3 class="chart-title">演习周期倒计时</h3>
+                <div class="chart-div chart-done">
+                  <div class="time-range">{{ startTime }} ~ {{ endTime }}</div>
+                  <div class="time-count-down">{{ formattedTime }}</div>
+                </div>
+              </BorderBox1>
             </div>
             <div class="chart-wrapper flex-1">
               <h3 class="chart-title">失陷次数最多单位</h3>
